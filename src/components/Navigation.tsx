@@ -19,7 +19,7 @@ export const Navigation = ({ activeMode, onModeChange }: NavigationProps) => {
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:animate-glow transition-all">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-semibold text-foreground">PhotoStudio</span>
+            <span className="text-xl font-semibold text-foreground">propho.ai</span>
           </div>
 
           {/* Navigation Links */}
