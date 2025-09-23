@@ -9,9 +9,9 @@ interface HeroSectionProps {
 
 export const HeroSection = ({ onModeSelect }: HeroSectionProps) => {
   return (
-    <div className="pt-20 pb-16">
+    <div className="pt-16 pb-8">
       {/* Hero Header */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section className="max-w-7xl mx-auto px-6 py-12">
         <div className="text-center space-y-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-sm text-primary font-medium">
             <Sparkles className="w-4 h-4" />
@@ -32,7 +32,7 @@ export const HeroSection = ({ onModeSelect }: HeroSectionProps) => {
         </div>
 
         {/* Hero Image */}
-        <div className="mt-16 relative">
+        <div className="mt-8 relative">
           <div className="card-elevated rounded-2xl overflow-hidden">
             <img 
               src={heroImage} 
