@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Upload, X, FileText, Image as ImageIcon, Palette, Layers, Sparkles } from "lucide-react";
+import { Upload, X, FileText, Image as ImageIcon, Palette, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,7 +15,6 @@ interface BriefStepProps {
 export const BriefStep = ({ data, updateData }: BriefStepProps) => {
   // Initialize data structure if not present
   const moodBoards = data.moodBoards || [];
-  const styleFrames = data.styleFrames || [];
   const colorPalettes = data.colorPalettes || [];
   const otherReferences = data.otherReferences || [];
   const otherReferenceDescriptions = data.otherReferenceDescriptions || [];
@@ -144,16 +143,11 @@ export const BriefStep = ({ data, updateData }: BriefStepProps) => {
         <div>
           <Label className="text-base font-medium mb-3 block">Reference Materials</Label>
           <Tabs defaultValue="moodBoards" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="moodBoards" className="flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
                 <span className="hidden sm:inline">Mood Boards</span>
                 <span className="sm:hidden">Mood</span>
-              </TabsTrigger>
-              <TabsTrigger value="styleFrames" className="flex items-center gap-1">
-                <Layers className="w-3 h-3" />
-                <span className="hidden sm:inline">Style Frames</span>
-                <span className="sm:hidden">Style</span>
               </TabsTrigger>
               <TabsTrigger value="colorPalettes" className="flex items-center gap-1">
                 <Palette className="w-3 h-3" />
@@ -170,11 +164,6 @@ export const BriefStep = ({ data, updateData }: BriefStepProps) => {
             <TabsContent value="moodBoards" className="mt-4">
               <p className="text-sm text-muted-foreground mb-3">Visual inspiration and overall aesthetic direction</p>
               {renderCompactUploadSection("moodBoards", moodBoards)}
-            </TabsContent>
-            
-            <TabsContent value="styleFrames" className="mt-4">
-              <p className="text-sm text-muted-foreground mb-3">Layout compositions and visual style references</p>
-              {renderCompactUploadSection("styleFrames", styleFrames)}
             </TabsContent>
             
             <TabsContent value="colorPalettes" className="mt-4">
