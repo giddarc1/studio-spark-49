@@ -3,6 +3,7 @@ import { Plus, FolderOpen, Users, Calendar, ChevronRight, Upload, Palette, Camer
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ProjectWizard } from "./ProjectWizard";
 
 interface Project {
   id: string;
@@ -15,7 +16,9 @@ interface Project {
 }
 
 export const ProjectsSection = () => {
-  const [projects] = useState<Project[]>([
+  const [showWizard, setShowWizard] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<string | undefined>();
+  const [projects, setProjects] = useState<Project[]>([
     {
       id: '1',
       name: 'Summer Jewelry Collection',
@@ -53,6 +56,50 @@ export const ProjectsSection = () => {
     { icon: Camera, title: 'Generate & Edit', description: 'AI generation and collaborative editing' }
   ];
 
+  const handleCreateProject = () => {
+    setEditingProjectId(undefined);
+    setShowWizard(true);
+  };
+
+  const handleEditProject = (projectId: string) => {
+    setEditingProjectId(projectId);
+    setShowWizard(true);
+  };
+
+  const handleSaveProject = (projectData: any) => {
+    if (editingProjectId) {
+      // Update existing project
+      setProjects(prev => prev.map(project => 
+        project.id === editingProjectId 
+          ? { ...project, name: projectData.name, lastUpdated: 'Just now' }
+          : project
+      ));
+    } else {
+      // Create new project
+      const newProject: Project = {
+        id: Date.now().toString(),
+        name: projectData.name,
+        description: 'AI-generated campaign project',
+        status: 'planning',
+        collaborators: 1,
+        lastUpdated: 'Just now',
+        step: 1
+      };
+      setProjects(prev => [newProject, ...prev]);
+    }
+    setShowWizard(false);
+  };
+
+  if (showWizard) {
+    return (
+      <ProjectWizard 
+        projectId={editingProjectId}
+        onClose={() => setShowWizard(false)}
+        onSave={handleSaveProject}
+      />
+    );
+  }
+
   return (
     <div className="pt-20 pb-16">
       <div className="max-w-7xl mx-auto px-6">
@@ -64,7 +111,7 @@ export const ProjectsSection = () => {
               Collaborative photoshoot replacement workflows
             </p>
           </div>
-          <Button className="gap-2 shadow-[var(--shadow-soft)]">
+          <Button onClick={handleCreateProject} className="gap-2 shadow-[var(--shadow-soft)]">
             <Plus className="w-4 h-4" />
             New Project
           </Button>
@@ -83,7 +130,7 @@ export const ProjectsSection = () => {
                   <p className="text-muted-foreground mb-6">
                     Create your first project to start generating professional product photography.
                   </p>
-                  <Button>
+                  <Button onClick={handleCreateProject}>
                     <Plus className="w-4 h-4 mr-2" />
                     Create First Project
                   </Button>
@@ -92,7 +139,11 @@ export const ProjectsSection = () => {
             ) : (
               <div className="space-y-4">
                 {projects.map((project) => (
-                  <Card key={project.id} className="card-interactive">
+                <Card 
+                  key={project.id} 
+                  className="card-interactive cursor-pointer"
+                  onClick={() => handleEditProject(project.id)}
+                >
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
