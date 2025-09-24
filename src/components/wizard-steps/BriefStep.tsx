@@ -1,10 +1,11 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Upload, X, FileText, Image as ImageIcon, Palette, Layers, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface BriefStepProps {
   data: any;
@@ -49,20 +50,14 @@ export const BriefStep = ({ data, updateData }: BriefStepProps) => {
     updateData({ otherReferenceDescriptions: newDescriptions });
   };
 
-  const renderUploadSection = (
-    title: string, 
-    icon: React.ReactNode, 
+  const renderCompactUploadSection = (
     category: string, 
     files: File[], 
-    description?: string
+    showDescriptions: boolean = false
   ) => (
     <div className="space-y-4">
-      <Label className="text-base font-medium flex items-center gap-2">
-        {icon}
-        {title}
-      </Label>
       <div 
-        className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors cursor-pointer"
+        className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center hover:border-muted-foreground/50 transition-colors cursor-pointer"
         onDrop={(e) => {
           e.preventDefault();
           handleFileUpload(e.dataTransfer.files, category);
@@ -70,12 +65,12 @@ export const BriefStep = ({ data, updateData }: BriefStepProps) => {
         onDragOver={handleDragOver}
         onClick={() => document.getElementById(`${category}-upload`)?.click()}
       >
-        <Upload className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+        <Upload className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
         <p className="text-sm text-muted-foreground mb-1">
-          Drag and drop files here, or click to browse
+          Drag and drop or click to browse
         </p>
         <p className="text-xs text-muted-foreground">
-          {description || "Supports: JPG, PNG, PDF, AI, PSD (Max 10MB each)"}
+          JPG, PNG, PDF, AI, PSD (Max 10MB each)
         </p>
         <input 
           id={`${category}-upload`}
@@ -89,7 +84,7 @@ export const BriefStep = ({ data, updateData }: BriefStepProps) => {
       
       {/* Uploaded Files Preview */}
       {files.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
           {files.map((file: File, index: number) => (
             <div key={index} className="space-y-2">
               <div className="relative group">
@@ -102,28 +97,28 @@ export const BriefStep = ({ data, updateData }: BriefStepProps) => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <FileText className="w-8 h-8 text-muted-foreground" />
+                      <FileText className="w-6 h-6 text-muted-foreground" />
                     </div>
                   )}
                 </div>
                 <Button
                   variant="destructive"
                   size="icon"
-                  className="absolute -top-2 -right-2 w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute -top-1 -right-1 w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity"
                   onClick={() => removeFile(index, category)}
                 >
-                  <X className="w-3 h-3" />
+                  <X className="w-2.5 h-2.5" />
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground truncate">
                 {file.name}
               </p>
-              {category === 'otherReferences' && (
+              {showDescriptions && (
                 <Input
                   placeholder="Describe this reference..."
                   value={otherReferenceDescriptions[index] || ''}
                   onChange={(e) => updateOtherReferenceDescription(index, e.target.value)}
-                  className="text-xs"
+                  className="text-xs h-7"
                 />
               )}
             </div>
@@ -144,42 +139,55 @@ export const BriefStep = ({ data, updateData }: BriefStepProps) => {
           Upload reference materials and define your creative vision with detailed categories.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-8">
-        {/* Mood Boards Section */}
-        {renderUploadSection(
-          "Mood Boards", 
-          <Sparkles className="w-4 h-4" />, 
-          "moodBoards", 
-          moodBoards,
-          "Visual inspiration and overall aesthetic direction"
-        )}
-
-        {/* Style Frames Section */}
-        {renderUploadSection(
-          "Style Frames", 
-          <Layers className="w-4 h-4" />, 
-          "styleFrames", 
-          styleFrames,
-          "Layout compositions and visual style references"
-        )}
-
-        {/* Color Palettes Section */}
-        {renderUploadSection(
-          "Color Palettes", 
-          <Palette className="w-4 h-4" />, 
-          "colorPalettes", 
-          colorPalettes,
-          "Color schemes and brand palette references"
-        )}
-
-        {/* Other Reference Materials Section */}
-        {renderUploadSection(
-          "Other Reference Materials", 
-          <ImageIcon className="w-4 h-4" />, 
-          "otherReferences", 
-          otherReferences,
-          "Any additional references - add descriptions below each upload"
-        )}
+      <CardContent className="space-y-6">
+        {/* Reference Materials Tabs */}
+        <div>
+          <Label className="text-base font-medium mb-3 block">Reference Materials</Label>
+          <Tabs defaultValue="moodBoards" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="moodBoards" className="flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                <span className="hidden sm:inline">Mood Boards</span>
+                <span className="sm:hidden">Mood</span>
+              </TabsTrigger>
+              <TabsTrigger value="styleFrames" className="flex items-center gap-1">
+                <Layers className="w-3 h-3" />
+                <span className="hidden sm:inline">Style Frames</span>
+                <span className="sm:hidden">Style</span>
+              </TabsTrigger>
+              <TabsTrigger value="colorPalettes" className="flex items-center gap-1">
+                <Palette className="w-3 h-3" />
+                <span className="hidden sm:inline">Color Palettes</span>
+                <span className="sm:hidden">Colors</span>
+              </TabsTrigger>
+              <TabsTrigger value="otherReferences" className="flex items-center gap-1">
+                <ImageIcon className="w-3 h-3" />
+                <span className="hidden sm:inline">Other</span>
+                <span className="sm:hidden">Other</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="moodBoards" className="mt-4">
+              <p className="text-sm text-muted-foreground mb-3">Visual inspiration and overall aesthetic direction</p>
+              {renderCompactUploadSection("moodBoards", moodBoards)}
+            </TabsContent>
+            
+            <TabsContent value="styleFrames" className="mt-4">
+              <p className="text-sm text-muted-foreground mb-3">Layout compositions and visual style references</p>
+              {renderCompactUploadSection("styleFrames", styleFrames)}
+            </TabsContent>
+            
+            <TabsContent value="colorPalettes" className="mt-4">
+              <p className="text-sm text-muted-foreground mb-3">Color schemes and brand palette references</p>
+              {renderCompactUploadSection("colorPalettes", colorPalettes)}
+            </TabsContent>
+            
+            <TabsContent value="otherReferences" className="mt-4">
+              <p className="text-sm text-muted-foreground mb-3">Any additional references - add descriptions below each upload</p>
+              {renderCompactUploadSection("otherReferences", otherReferences, true)}
+            </TabsContent>
+          </Tabs>
+        </div>
 
         {/* Creative Brief Notes */}
         <div>
@@ -191,7 +199,7 @@ export const BriefStep = ({ data, updateData }: BriefStepProps) => {
             placeholder="Describe your creative vision, target audience, brand guidelines, mood, style direction, and any specific requirements..."
             value={data.briefNotes || ''}
             onChange={(e) => updateData({ briefNotes: e.target.value })}
-            className="min-h-[120px] resize-none"
+            className="min-h-[100px] resize-none"
           />
           <p className="text-xs text-muted-foreground mt-2">
             Be as detailed as possible to get the best AI-generated results.
@@ -199,7 +207,7 @@ export const BriefStep = ({ data, updateData }: BriefStepProps) => {
         </div>
 
         {/* Example References */}
-        <div className="bg-muted/30 rounded-lg p-4">
+        <div className="bg-muted/30 rounded-lg p-3">
           <h4 className="font-medium text-sm mb-2">💡 Pro Tips</h4>
           <ul className="text-xs text-muted-foreground space-y-1">
             <li>• Upload mood boards to define visual style and color palette</li>
